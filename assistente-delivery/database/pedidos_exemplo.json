@@ -1,0 +1,34 @@
+{
+  "pedidoId": {
+    "S": "PED001"
+  },
+  "cliente": {
+    "S": "Cliente Teste"
+  },
+  "produtos": {
+    "L": [
+      {
+        "M": {
+          "nome": {
+            "S": "Hamburguer"
+          },
+          "quantidade": {
+            "N": "2"
+          },
+          "preco": {
+            "N": "25.00"
+          }
+        }
+      }
+    ]
+  },
+  "valorTotal": {
+    "N": "50.00"
+  },
+  "status": {
+    "S": "RECEBIDO"
+  },
+  "criadoEm": {
+    "S": "2026-11-02T15:00:00"
+  }
+}

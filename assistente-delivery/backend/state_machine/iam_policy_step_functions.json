@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+        "SUBSTITUIR_PELO_ARN_VALIDAR_PEDIDO",
+        "SUBSTITUIR_PELO_ARN_VERIFICAR_ESTOQUE",
+        "SUBSTITUIR_PELO_ARN_PROCESSAR_PAGAMENTO",
+        "SUBSTITUIR_PELO_ARN_ATUALIZAR_STATUS"
+      ]
+    }
+  ]
+}

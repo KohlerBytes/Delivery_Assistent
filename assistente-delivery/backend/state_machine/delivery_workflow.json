@@ -1,0 +1,172 @@
+{
+  "Comment": "Workflow do Assistente de Delivery",
+  "StartAt": "ValidarPedido",
+  "States": {
+    "ValidarPedido": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "SUBSTITUIR_PELO_ARN_VALIDAR_PEDIDO",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "Payload.$": "$.Payload"
+      },
+      "ResultPath": "$.validacao",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.erro",
+          "Next": "FalhaExecucao"
+        }
+      ],
+      "Next": "PedidoValido?"
+    },
+    "PedidoValido?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.validacao.Payload.valido",
+          "BooleanEquals": true,
+          "Next": "VerificarEstoque"
+        }
+      ],
+      "Default": "PedidoInvalido"
+    },
+    "PedidoInvalido": {
+      "Type": "Pass",
+      "Parameters": {
+        "resultado": "PEDIDO_INVALIDO",
+        "erros.$": "$.validacao.Payload.erros"
+      },
+      "End": true
+    },
+    "VerificarEstoque": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "SUBSTITUIR_PELO_ARN_VERIFICAR_ESTOQUE",
+        "Payload": {
+          "valido.$": "$.validacao.Payload.valido",
+          "pedido.$": "$.validacao.Payload.pedido"
+        }
+      },
+      "ResultSelector": {
+        "Payload.$": "$.Payload"
+      },
+      "ResultPath": "$.estoque",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.erro",
+          "Next": "FalhaExecucao"
+        }
+      ],
+      "Next": "EstoqueDisponivel?"
+    },
+    "EstoqueDisponivel?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.estoque.Payload.estoqueDisponivel",
+          "BooleanEquals": true,
+          "Next": "ProcessarPagamento"
+        }
+      ],
+      "Default": "EstoqueIndisponivel"
+    },
+    "EstoqueIndisponivel": {
+      "Type": "Pass",
+      "Parameters": {
+        "resultado": "ESTOQUE_INDISPONIVEL",
+        "pedido.$": "$.estoque.Payload.pedido",
+        "erros.$": "$.estoque.Payload.erros"
+      },
+      "End": true
+    },
+    "ProcessarPagamento": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "SUBSTITUIR_PELO_ARN_PROCESSAR_PAGAMENTO",
+        "Payload": {
+          "estoqueDisponivel.$": "$.estoque.Payload.estoqueDisponivel",
+          "pedido.$": "$.estoque.Payload.pedido",
+          "simularAprovacao.$": "$.simularAprovacao"
+        }
+      },
+      "ResultSelector": {
+        "Payload.$": "$.Payload"
+      },
+      "ResultPath": "$.pagamento",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.erro",
+          "Next": "FalhaExecucao"
+        }
+      ],
+      "Next": "PagamentoAprovado?"
+    },
+    "PagamentoAprovado?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.pagamento.Payload.pagamentoAprovado",
+          "BooleanEquals": true,
+          "Next": "AtualizarPedido"
+        }
+      ],
+      "Default": "AtualizarPedido"
+    },
+    "AtualizarPedido": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "SUBSTITUIR_PELO_ARN_ATUALIZAR_STATUS",
+        "Payload": {
+          "pagamentoAprovado.$": "$.pagamento.Payload.pagamentoAprovado",
+          "pedidoId.$": "$.pagamento.Payload.pedidoId",
+          "valorPago.$": "$.pagamento.Payload.valorPago",
+          "statusPagamento.$": "$.pagamento.Payload.statusPagamento",
+          "pedido.$": "$.estoque.Payload.pedido"
+        }
+      },
+      "ResultSelector": {
+        "Payload.$": "$.Payload"
+      },
+      "ResultPath": "$.atualizacao",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.erro",
+          "Next": "FalhaExecucao"
+        }
+      ],
+      "Next": "ResultadoFinal"
+    },
+    "ResultadoFinal": {
+      "Type": "Pass",
+      "Parameters": {
+        "sucesso.$": "$.atualizacao.Payload.sucesso",
+        "pedidoId.$": "$.atualizacao.Payload.pedidoId",
+        "status.$": "$.atualizacao.Payload.status",
+        "mensagem.$": "$.atualizacao.Payload.mensagem"
+      },
+      "End": true
+    },
+    "FalhaExecucao": {
+      "Type": "Fail",
+      "Error": "FalhaNoProcessamento",
+      "Cause": "Ocorreu um erro durante a execução do Assistente de Delivery."
+    }
+  }
+}

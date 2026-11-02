@@ -1,0 +1,53 @@
+[
+  {
+    "produtoId": {
+      "S": "PROD001"
+    },
+    "nome": {
+      "S": "Hamburguer"
+    },
+    "preco": {
+      "N": "25.00"
+    },
+    "estoque": {
+      "N": "20"
+    },
+    "disponivel": {
+      "BOOL": true
+    }
+  },
+  {
+    "produtoId": {
+      "S": "PROD002"
+    },
+    "nome": {
+      "S": "Pizza"
+    },
+    "preco": {
+      "N": "40.00"
+    },
+    "estoque": {
+      "N": "15"
+    },
+    "disponivel": {
+      "BOOL": true
+    }
+  },
+  {
+    "produtoId": {
+      "S": "PROD003"
+    },
+    "nome": {
+      "S": "Refrigerante"
+    },
+    "preco": {
+      "N": "8.00"
+    },
+    "estoque": {
+      "N": "30"
+    },
+    "disponivel": {
+      "BOOL": true
+    }
+  }
+]
